@@ -39,11 +39,11 @@ jobs:
 
       - name: Run Conftest Policy Checks
         run: |
-          if [ -d "policy" ]; then
-            conftest test *.tf --policy policy/
-          else
-            echo "No policy directory found, skipping OPA checks."
+          if [ ! -d "policy" ]; then
+            echo "Policy directory not found. Failing the build as OPA Conftest checks are mandatory." >&2
+            exit 1
           fi
+          conftest test *.tf --policy policy/
 
       - name: Terraform Plan
         run: terraform plan
