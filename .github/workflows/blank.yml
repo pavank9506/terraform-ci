@@ -48,7 +48,7 @@ jobs:
           fi
         working-directory: terraform
 
-      - name: Debug: Print plan.json
+      - name: Debug Print plan.json
         run: |
           if [ -f plan.json ]; then
             echo "--- plan.json contents ---"
