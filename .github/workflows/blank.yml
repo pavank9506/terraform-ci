@@ -46,7 +46,7 @@ jobs:
         working-directory: terraform
 
       - name: Enforce OPA Policies
-        run: conftest test plan.json --policy policy/
+        run: conftest test plan.json --policy ../policy/
         working-directory: terraform
 
       - name: Terraform Plan
