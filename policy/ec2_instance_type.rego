@@ -19,4 +19,3 @@ deny[msg] {
     [r.address, instance_type, allowed_instance_type]
   )
 }
-
