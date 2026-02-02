@@ -27,11 +27,11 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        # working-directory: terraform
+        working-directory: terraform
 
       - name: Terraform Validate
         run: terraform validate
-        # working-directory: terraform
+        working-directory: terraform
       - name: Install Conftest
         run: |
           wget https://github.com/open-policy-agent/conftest/releases/download/v0.51.0/conftest_0.51.0_Linux_x86_64.tar.gz
@@ -55,7 +55,7 @@ jobs:
           ls -R .
           echo "Policy dir contents:"
           ls -R ../policy || true
-      #  working-directory: terraform
+        working-directory: terraform
 
       - name: Enforce OPA Policies
         run: |
@@ -64,4 +64,4 @@ jobs:
             exit 1
           fi
           conftest test plan.json --policy ../policy/
-        # working-directory: terraform
+        working-directory: terraform
