@@ -57,6 +57,3 @@ jobs:
           fi
           conftest test plan.json --policy ../policy/
         working-directory: terraform
-
-      - name: Terraform Plan
-        # Removed duplicate Terraform Plan step
