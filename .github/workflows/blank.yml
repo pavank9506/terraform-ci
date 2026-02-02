@@ -48,6 +48,17 @@ jobs:
           fi
         working-directory: terraform
 
+      - name: Debug: Print plan.json
+        run: |
+          if [ -f plan.json ]; then
+            echo "--- plan.json contents ---"
+            cat plan.json
+            echo "--- end plan.json ---"
+          else
+            echo "plan.json not found!"
+          fi
+        working-directory: terraform
+
       - name: Debug policy loading
         run: |
           pwd
