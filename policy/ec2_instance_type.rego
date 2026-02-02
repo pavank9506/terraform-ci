@@ -1,21 +1,15 @@
 package terraform.ec2
 
-allowed_instance_type = "t3.small"
-
 deny[msg] {
-  r := input.resource_changes[_]
-
-  # Only target EC2 instances
-  r.type == "aws_instance"
-
-  # Instance type after change
-  instance_type := r.change.after.instance_type
-
-  # Fail if not allowed
-  instance_type != allowed_instance_type
+  resource := input.resource_changes[_]
+  resource.type == "aws_instance"
+  resource.change.after.instance_type != "t3.small"
 
   msg := sprintf(
-    "EC2 instance %s has instance_type %s. Only %s is allowed.",
-    [r.address, instance_type, allowed_instance_type]
+    "EC2 instance '%s' must use instance_type t3.small (found: %s)",
+    [
+      resource.name,
+      resource.change.after.instance_type
+    ]
   )
 }
