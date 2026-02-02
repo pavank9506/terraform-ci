@@ -27,9 +27,11 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        working-directory: terraform
 
       - name: Terraform Validate
         run: terraform validate
+        working-directory: terraform
 
       - name: Install Conftest
         run: |
@@ -41,10 +43,12 @@ jobs:
         run: |
           terraform plan -out=tfplan
           terraform show -json tfplan > plan.json
+        working-directory: terraform
 
       - name: Enforce OPA Policies
         run: conftest test plan.json --policy policy/
-
+        working-directory: terraform
 
       - name: Terraform Plan
         run: terraform plan
+        working-directory: terraform
