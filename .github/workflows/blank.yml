@@ -46,7 +46,7 @@ jobs:
             echo "plan.json not found! Failing pipeline." >&2
             exit 1
           fi
-        # working-directory: terraform
+        working-directory: terraform
 
       - name: Debug policy loading
         run: |
