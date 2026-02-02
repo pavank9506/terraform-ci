@@ -37,13 +37,14 @@ jobs:
           tar xzf conftest_0.51.0_Linux_x86_64.tar.gz
           sudo mv conftest /usr/local/bin/
 
-      - name: Run Conftest Policy Checks
+      - name: Terraform Plan
         run: |
-          if [ ! -d "policy" ]; then
-            echo "Policy directory not found. Failing the build as OPA Conftest checks are mandatory." >&2
-            exit 1
-          fi
-          find . -name "*.tf" -print0 | xargs -0 conftest test --policy policy/
+          terraform plan -out=tfplan
+          terraform show -json tfplan > plan.json
+
+      - name: Enforce OPA Policies
+        run: conftest test plan.json --policy policy/
+
 
       - name: Terraform Plan
         run: terraform plan
