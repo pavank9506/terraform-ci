@@ -40,15 +40,25 @@ jobs:
           sudo mv conftest /usr/local/bin/
 
       - name: Terraform Plan
+
+      - name: Terraform Plan (create plan.json)
         run: |
           terraform plan -out=tfplan
           terraform show -json tfplan > plan.json
+          if [ ! -f plan.json ]; then
+            echo "plan.json not found! Failing pipeline." >&2
+            exit 1
+          fi
         working-directory: terraform
 
       - name: Enforce OPA Policies
-        run: conftest test plan.json --policy ../policy/
+        run: |
+          if [ ! -f plan.json ]; then
+            echo "plan.json not found! Failing pipeline before policy check." >&2
+            exit 1
+          fi
+          conftest test plan.json --policy ../policy/
         working-directory: terraform
 
       - name: Terraform Plan
-        run: terraform plan
-        working-directory: terraform
+        # Removed duplicate Terraform Plan step
