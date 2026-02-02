@@ -43,7 +43,7 @@ jobs:
             echo "Policy directory not found. Failing the build as OPA Conftest checks are mandatory." >&2
             exit 1
           fi
-          conftest test *.tf --policy policy/
+          find . -name "*.tf" -print0 | xargs -0 conftest test --policy policy/
 
       - name: Terraform Plan
         run: terraform plan
