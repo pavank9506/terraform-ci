@@ -64,6 +64,15 @@ jobs:
           fi
         working-directory: terraform
 
+      - name: Debug Conftest and Policy Loading
+        run: |
+          conftest --version
+          echo "Listing policy files in ../policy:"
+          ls -l ../policy
+          echo "Showing policy file contents:"
+          for f in ../policy/*.rego; do echo "--- $f ---"; cat $f; echo "--- end $f ---"; done
+        working-directory: terraform
+
       - name: Debug policy loading
         run: |
           pwd
