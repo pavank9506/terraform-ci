@@ -99,17 +99,31 @@ jobs:
             --format json \
             --out-file infracost.json
 
+      - name: Convert cost to markdown
+        run: |
+          infracost output \
+            --path infracost.json \
+            --format github-comment \
+            --out-file infracost.md
+
       - name: Post cost comment to PR
         env:
-          INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          infracost comment github \
-            --path infracost.json \
-            --repo ${{ github.repository }} \
-            --pull-request ${{ github.event.pull_request.number }} \
-            --github-token $GITHUB_TOKEN \
-            --behavior update
+          gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments \
+          -f body="$(cat infracost.md)"
+
+      # - name: Post cost comment to PR
+      #   env:
+      #     INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     infracost comment github \
+      #       --path infracost.json \
+      #       --repo ${{ github.repository }} \
+      #       --pull-request ${{ github.event.pull_request.number }} \
+      #       --github-token $GITHUB_TOKEN \
+      #       --behavior update
 
   #     if: github.event_name == 'push'
   # run: |
