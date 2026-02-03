@@ -107,6 +107,7 @@ jobs:
             --out-file infracost.md
 
       - name: Post cost comment to PR
+        if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
