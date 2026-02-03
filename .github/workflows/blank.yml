@@ -48,6 +48,11 @@ jobs:
           fi
         working-directory: terraform
 
+      - name: print Plan (create plan.json)
+        run: |
+          cat plan.json
+        working-directory: terraform
+
       - name: Debug Print plan.json
         run: |
           if [ -f plan.json ]; then
