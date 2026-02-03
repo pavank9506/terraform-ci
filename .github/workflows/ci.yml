@@ -105,3 +105,12 @@ jobs:
             --repo ${{ github.repository }} \
             --pull-request ${{ github.event.pull_request.number }} \
             --behavior update
+
+  #     if: github.event_name == 'push'
+  # run: |
+  # infracost comment github \
+  #   --path infracost.json \
+  #   --repo ${{ github.repository }} \
+  #   --commit ${{ github.sha }} \
+  #   --github-token $GITHUB_TOKEN \
+  #   --behavior update
