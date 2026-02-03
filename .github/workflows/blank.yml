@@ -75,4 +75,4 @@ jobs:
             exit 1
           fi
           conftest test plan.json --policy ../policy/
-        # working-directory: terraform
+        working-directory: terraform
