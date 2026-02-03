@@ -1,4 +1,4 @@
-package terraform.ec2
+package main
 
 deny[msg] {
   resource := input.resource_changes[_]
