@@ -64,15 +64,6 @@ jobs:
           fi
         working-directory: terraform
 
-      - name: Debug Conftest and Policy Loading
-        run: |
-          conftest --version
-          echo "Listing policy files in ../policy:"
-          ls -l ../policy
-          echo "Showing policy file contents:"
-          for f in ../policy/*.rego; do echo "--- $f ---"; cat $f; echo "--- end $f ---"; done
-        working-directory: terraform
-
       - name: Debug policy loading
         run: |
           pwd
@@ -90,3 +81,28 @@ jobs:
           fi
           conftest test plan.json --policy ../policy/
         working-directory: terraform
+
+      - name: Install Infracost
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/infracost/infracost/master/scripts/install.sh | sh
+
+      - name: Run Infracost
+        env:
+          INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+        run: |
+          infracost breakdown \
+            --path terraform \
+            --format json \
+            --out-file infracost.json
+
+      - name: Post cost comment to PR
+        env:
+          INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          infracost comment github \
+            --path infracost.json \
+            --repo ${{ github.repository }} \
+            --pull-request ${{ github.event.pull_request.number }} \
+            --github-token $GITHUB_TOKEN \
+            --behavior update
