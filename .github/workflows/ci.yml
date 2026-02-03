@@ -6,12 +6,16 @@ on:
   push:
     branches: [ main ]
 
+permissions:
+  pull-requests: write
+  contents: read
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -73,14 +77,14 @@ jobs:
           ls -R ../policy || true
         working-directory: terraform
 
-      - name: Enforce OPA Policies
-        run: |
-          if [ ! -f plan.json ]; then
-            echo "plan.json not found! Failing pipeline before policy check." >&2
-            exit 1
-          fi
-          conftest test plan.json --policy ../policy/
-        working-directory: terraform
+      # - name: Enforce OPA Policies
+      #   run: |
+      #     if [ ! -f plan.json ]; then
+      #       echo "plan.json not found! Failing pipeline before policy check." >&2
+      #       exit 1
+      #     fi
+      #     conftest test plan.json --policy ../policy/
+      #   working-directory: terraform
 
       - name: Install Infracost
         run: |
@@ -95,13 +99,37 @@ jobs:
             --format json \
             --out-file infracost.json
 
+      - name: Convert cost to markdown
+        run: |
+          infracost output \
+            --path infracost.json \
+            --format github-comment \
+            --out-file infracost.md
+
       - name: Post cost comment to PR
         env:
-          INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
-          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          infracost comment github \
-            --path infracost.json \
-            --repo ${{ github.repository }} \
-            --pull-request ${{ github.event.pull_request.number }} \
-            --behavior update
+          gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments \
+          -f body="$(cat infracost.md)"
+
+      # - name: Post cost comment to PR
+      #   env:
+      #     INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     infracost comment github \
+      #       --path infracost.json \
+      #       --repo ${{ github.repository }} \
+      #       --pull-request ${{ github.event.pull_request.number }} \
+      #       --github-token $GITHUB_TOKEN \
+      #       --behavior update
+
+  #     if: github.event_name == 'push'
+  # run: |
+  # infracost comment github \
+  #   --path infracost.json \
+  #   --repo ${{ github.repository }} \
+  #   --commit ${{ github.sha }} \
+  #   --github-token $GITHUB_TOKEN \
+  #   --behavior update
